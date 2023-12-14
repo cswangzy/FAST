@@ -295,21 +295,14 @@ while True:
         print(tau, sampling_rate)
         data_size = 0
         t_cp, La, epi, model_divergence, data_rate, data_size = local_train(tau, sampling_rate)
-        if count_div % div == 0:
+        # if count_div % div == 0:
         #     if args.model_type == "AlexNet":
-        #         remember = random.uniform(0.8,2.2)
+        #         remember = random.uniform(0.8,5.2)
         #     elif args.model_type == "LeNet":
-        #         remember = random.uniform(2.5,5.5)
+        #         remember = random.uniform(1.5,7.5)
         #         remember = float(remember)/10
         #     elif args.model_type == "ResNet":
-        #         remember = random.uniform(1.8,4.2)
-            if args.model_type == "AlexNet":
-                remember = random.uniform(0.8,5.2)
-            elif args.model_type == "LeNet":
-                remember = random.uniform(1.5,7.5)
-                remember = float(remember)/10
-            elif args.model_type == "ResNet":
-                remember = random.uniform(1.8,8.5)
+        #         remember = random.uniform(1.8,8.5)
 
         t_cp = float(remember*data_size*tau)/100 
 
