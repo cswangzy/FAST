@@ -71,35 +71,7 @@ class EpsilonGreedy(object):
         else:
             self.rewards[arm] += self.gamma * (rwd - self.rewards[arm])
 
-def compute_distribution(tcm, tcp,La, epi, model_divergence, device_num, lr, epoch, tau):
-    A1 = model_divergence + lr*epoch*(1/La - lr)*pow(epi,2)
-    try:
-        A2 = math.pow(1 + lr * La, tau*epoch+tau)*(math.pow(1 + lr * La, tau)-1)*epi/((math.pow(1 + lr * La, tau*epoch)-1)*device_num*La)
-    except:
-        A2 = 1
-    return A1/A2
 
-def compute_g(tcm, tcp,La, epi, model_divergence, device_num, lr, epoch, tau, bound,data_rate):
-    A4 = compute_distribution(tcm, tcp,La, epi, model_divergence, device_num, lr, epoch, tau)
-    min = 100000
-    for i in range(1,21):
-        max = 0
-        for j in range(device_num):
-            if max< i*tcp[j]+tcm[j]:
-                max = i*tcp[j]+tcm[j]
-        #K = epoch + bound/max
-        K = bound/max
-        A1 = model_divergence - lr*K*(1/La - lr)*pow(epi,2)
-        try:
-            A2 = math.pow(1 + lr * La, tau*K+tau)*(math.pow(1 + lr * La, tau)-1)*epi/((math.pow(1 + lr * La, tau*K)-1)*device_num*La)        
-            if min > 1.0/float(K) * (A1-A2*A4):
-                min = 1.0/float(K) * (A1-A2*A4)
-                tau = i
-        except:
-            tau = 10
-            min = 1
-    print("the total training epochs can be exectued under time budget " + str(np.mean(epoch + bound/(tau*tcp+tcm))))
-    return data_rate*min, tau
         
 
 def data_sampling(class_num, device_num, rward, agents,epoch, sampling_rate, frac, sampling_index):
@@ -120,14 +92,6 @@ def data_sampling(class_num, device_num, rward, agents,epoch, sampling_rate, fra
     return agents, sampling_rate, sampling_index
             
 
-def fast(tcm, tcp, La, epi, model_divergence, device_num, lr, epoch, tau, bound,data_rate, class_num,frac, sampling_index,agents,sampling_rate):
-    a=0
-    if epoch == 0:
-        tau = 10
-    else:
-        a, tau = compute_g(tcm, tcp,La, epi, model_divergence, device_num, lr, epoch, tau, bound,data_rate)
-    agents, sampling_rate,sampling_index = data_sampling(class_num, device_num, a, agents,epoch, sampling_rate, frac, sampling_index)
-    return agents, sampling_rate, tau, sampling_index
 
 def fedavg(device_num,class_num):
     sampling_rate = np.ones((device_num,class_num), dtype=np.float)
